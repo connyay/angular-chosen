@@ -52,10 +52,8 @@ angular.module('localytics.directives').directive 'chosen', ['$timeout', ($timeo
     defaultText = null
     empty = false
 
-    initOrUpdate = ->
-      if chosen
-        element.trigger('chosen:updated')
-      else
+    init = ->
+      if !chosen
         chosen = element.chosen(options).data('chosen')
         defaultText = chosen.default_text
 
@@ -73,7 +71,7 @@ angular.module('localytics.directives').directive 'chosen', ['$timeout', ($timeo
       origRender = ngModel.$render
       ngModel.$render = ->
         origRender()
-        initOrUpdate()
+        init()
 
       # This is basically taken from angular ngOptions source.  ngModel watches reference, not value,
       # so when values are added or removed from array ngModels, $render won't be fired.
@@ -82,7 +80,7 @@ angular.module('localytics.directives').directive 'chosen', ['$timeout', ($timeo
         scope.$watch viewWatch, ngModel.$render, true
     # If we're not using ngModel (and therefore also not using ngOptions, which requires ngModel),
     # just initialize chosen immediately since there's no need to wait for ngOptions to render first
-    else initOrUpdate()
+    else init()
 
     # Watch the disabled attribute (could be set by ngDisabled)
     attr.$observe 'disabled', -> element.trigger('chosen:updated')
